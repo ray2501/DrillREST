@@ -37,9 +37,19 @@ package provide DrillREST 0.1
 
 oo::class create DrillREST {
     variable server
+    variable ssl_enabled
 
-    constructor {{SERVER http://localhost:8047}} {
+    constructor {{SERVER http://localhost:8047} {SSL_ENABLED 0}} {
         set server $SERVER
+        set ssl_enabled $SSL_ENABLED
+
+        if {$ssl_enabled} {
+            if {[catch {package require tls}]==0} {
+                http::register https 443 [list ::tls::socket -ssl3 0 -ssl2 0 -tls1 1]
+            } else {
+                error "SSL_ENABLED needs package tls..."
+            }
+        }
     }
 
     destructor {
