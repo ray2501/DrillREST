@@ -100,3 +100,6 @@ If user enables HTTPS support, below is an example:
 
     set mydrill [DrillREST new https://localhost:8047 1]
 
+Please notice, I use [TLS extension] (http://tls.sourceforge.net/) to add https support.
+So https support needs TLS extension.
+
