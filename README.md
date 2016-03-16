@@ -79,7 +79,8 @@ To view the data in the region.parquet file, use the actual path to your Drill i
     package require json
 
     set mydrill [DrillREST new http://localhost:8047]
-    set result [$mydrill query "SELECT * FROM dfs.`/home/danilo/Programs/apache-drill-1.5.0/sample-data/region.parquet`"]
+    set result [$mydrill query "SELECT * FROM \
+        dfs.`/home/danilo/Programs/apache-drill-1.6.0/sample-data/region.parquet`"]
 
     set parse_result [json::json2dict $result]
     set rows [dict get $parse_result rows]
@@ -89,3 +90,13 @@ To view the data in the region.parquet file, use the actual path to your Drill i
             puts "$key - $value"
         }
     }
+
+## HTTPS support
+
+If user enables HTTPS support, below is an example:
+
+    package require DrillREST
+    package require json
+
+    set mydrill [DrillREST new https://localhost:8047 1]
+
