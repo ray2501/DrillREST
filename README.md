@@ -103,3 +103,37 @@ If user enables HTTPS support, below is an example:
 Please notice, I use [TLS extension] (http://tls.sourceforge.net/) to add https support.
 So https support needs TLS extension.
 
+## User Authentication
+
+Drill currently supports username/password based authentication through the use of the Linux Pluggable Authentication Module (PAM).
+Drill 1.5 extends Drill user authentication to the Web Console and underlying REST API.
+
+Below is an example (please remember to setup username and password variable):
+
+    package require DrillREST
+    package require json
+
+    set mydrill [DrillREST new https://localhost:8047 1]
+    $mydrill login $username $password
+    set result [$mydrill query "select version from sys.version"]
+
+    set parse_result [json::json2dict $result]
+    puts "Apache Drill version"
+    puts "=========="
+
+    set rows [dict get $parse_result rows]
+    foreach row $rows {
+        foreach {key value} $row {
+            if {[string compare $key "version"]==0} {
+                puts "$value"
+            }
+        }
+    }
+
+    # I just connect to /logout address and get status code
+    $mydrill logout
+
+I download [jpam] (https://sourceforge.net/projects/jpam/) to test this function.
+REST API user authentication works but I think it is not a mature function.
+Or I need to research more for this item if possible.
+
