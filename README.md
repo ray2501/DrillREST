@@ -16,8 +16,6 @@ The library consists of a single [Tcl Module] (http://tcl.tk/man/tcl8.6/TclCmd/t
 
 DrillREST is using Tcl built-in package http to send request to Apache Drill server and get response.
 
-I only test this extension on Apache Drill embedded mode.
-
 This extension needs Tcl 8.6 and tcllib json::write package.
 
 

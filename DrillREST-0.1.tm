@@ -39,11 +39,13 @@ oo::class create DrillREST {
     variable server
     variable ssl_enabled
     variable cookies
+    variable response
 
     constructor {{SERVER http://localhost:8047} {SSL_ENABLED 0}} {
         set server $SERVER
         set ssl_enabled $SSL_ENABLED
         set cookies [list]
+        set response ""
 
         if {$ssl_enabled} {
             if {[catch {package require tls}]==0} {
@@ -57,7 +59,7 @@ oo::class create DrillREST {
     destructor {
     }
 
-    method send_request {url method {headers ""} {needstate 0} {data ""}} {
+    method send_request {url method {headers ""} {data ""}} {
         variable tok
 
         if {[string length $data] < 1} {
@@ -81,40 +83,42 @@ oo::class create DrillREST {
             }
         }
 
-        if {$needstate != 0} {
-            set res [http::status $tok]
-        } else {
-            set res [http::data $tok]
-        }
+        set res [http::status $tok]
+        set [namespace current]::response [http::data $tok]
 
         http::cleanup $tok
         return $res
     }
 
     method login {USERNAME PASSWORD} {
+        my variable headerl
+
+        set [namespace current]::response ""
         set myurl "$server/j_security_check"
         set headerl [list Content-Type "application/x-www-form-urlencoded"]
         set content [::http::formatQuery j_username $USERNAME j_password $PASSWORD]
-        set res [my send_request $myurl POST $headerl 0 $content]
-        return $res
+        set res [my send_request $myurl POST $headerl $content]
+        return $response
     }
 
     method logout {} {
-        variable headerl
+        my variable headerl
 
+        set [namespace current]::response ""
         set myurl "$server/logout"
         set headerl [list Accept "text/html"]
         if {[llength $cookies] > 0} {
              lappend headerl Cookie [join $cookies {;}]
         }
-        set res [my send_request $myurl GET $headerl 1]
+        set res [my send_request $myurl GET $headerl]
         return $res
     }
 
     method query {sql_query} {
-        variable sql_string
-        variable headerl
+        my variable sql_string
+        my variable headerl
 
+        set [namespace current]::response ""
         set sql_string [::json::write object \
                         "queryType" "\"SQL\"" "query" "\"$sql_query\""]
         set myurl "$server/query.json"
@@ -123,13 +127,14 @@ oo::class create DrillREST {
         if {[llength $cookies] > 0} {
              lappend headerl Cookie [join $cookies {;}]
         }
-        set res [my send_request $myurl POST $headerl 0 $sql_string]
-        return $res
+        set res [my send_request $myurl POST $headerl $sql_string]
+        return $response
     }
 
     method getProfiles {} {
-        variable headerl
+        my variable headerl
 
+        set [namespace current]::response ""
         set myurl "$server/profiles.json"
         set headerl [list Accept "application/json" \
                           Content-Type "application/json"]
@@ -137,12 +142,13 @@ oo::class create DrillREST {
              lappend header1 Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl GET $headerl]
-        return $res
+        return $response
     }
 
     method getStorage {} {
-        variable headerl
+        my variable headerl
 
+        set [namespace current]::response ""
         set myurl "$server/storage.json"
         set headerl [list Accept "application/json" \
                           Content-Type "application/json"]
@@ -150,12 +156,13 @@ oo::class create DrillREST {
              lappend header1 Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl GET $headerl]
-        return $res
+        return $response
     }
 
     method getStats {} {
-        variable headerl
+        my variable headerl
 
+        set [namespace current]::response ""
         set myurl "$server/stats.json"
         set headerl [list Accept "application/json" \
                           Content-Type "application/json"]
@@ -163,12 +170,13 @@ oo::class create DrillREST {
              lappend header1 Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl GET $headerl]
-        return $res
+        return $response
     }
 
     method getOptions {} {
-        variable headerl
+        my variable headerl
 
+        set [namespace current]::response ""
         set myurl "$server/options.json"
         set headerl [list Accept "application/json" \
                           Content-Type "application/json"]
@@ -176,6 +184,6 @@ oo::class create DrillREST {
              lappend header1 Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl GET $headerl]
-        return $res
+        return $response
     }
 }
