@@ -2,17 +2,17 @@
 DrillREST
 =====
 
-[Apache Drill] (https://drill.apache.org/) is a low-latency distributed query engine for large-scale datasets,
+[Apache Drill](https://drill.apache.org/) is a low-latency distributed query engine for large-scale datasets,
 including structured and semi-structured/nested data.
 
 You can connect to Apache Drill through the following interfaces:
  * JDBC
  * ODBC
  * Drill shell
- * Drill Web Console, [REST API] (https://drill.apache.org/docs/rest-api/)
+ * Drill Web Console, [REST API](https://drill.apache.org/docs/rest-api/)
 
-This extension is an Apache Drill REST Client Library for [Tcl] (http://tcl.tk).
-The library consists of a single [Tcl Module] (http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file.
+This extension is an Apache Drill REST Client Library for [Tcl](http://tcl.tk).
+The library consists of a single [Tcl Module](http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file.
 
 DrillREST is using Tcl built-in package http to send request to Apache Drill server and get response.
 
@@ -68,7 +68,7 @@ Apache Drill provides sample data, try it:
         }
     }
 
-## Querying a [Parquet] (https://parquet.apache.org/) File
+## Querying a [Parquet](https://parquet.apache.org/) File
 
 Query the region.parquet and nation.parquet files in the sample-data directory on your local file system.
 To view the data in the region.parquet file, use the actual path to your Drill installation to construct this query:
@@ -98,7 +98,7 @@ If user enables HTTPS support, below is an example:
 
     set mydrill [DrillREST new https://localhost:8047 1]
 
-Please notice, I use [TLS extension] (http://tls.sourceforge.net/) to add https support.
+Please notice, I use [TLS extension](http://tls.sourceforge.net/) to add https support.
 So https support needs TLS extension.
 
 ## User Authentication
@@ -131,7 +131,7 @@ Below is an example (please remember to setup username and password variable):
     # I just connect to /logout address and get status code
     $mydrill logout
 
-I download [jpam] (https://sourceforge.net/projects/jpam/) to test this function.
+I download [jpam](https://sourceforge.net/projects/jpam/) to test this function.
 REST API user authentication works but I think it is not a mature function.
 Or I need to research more for this item if possible.
 
