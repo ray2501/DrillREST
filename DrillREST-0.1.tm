@@ -2,7 +2,7 @@
 #
 #	Drill REST Client Library for Tcl
 #
-# Copyright (C) 2016 Danilo Chang <ray2501@gmail.com>
+# Copyright (C) 2016-2018 Danilo Chang <ray2501@gmail.com>
 #
 # Retcltribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -62,31 +62,33 @@ oo::class create DrillREST {
     method send_request {url method {headers ""} {data ""}} {
         variable tok
 
-        if {[string length $data] < 1} {
-            if {[catch {set tok [http::geturl $url -method $method \
-                -headers $headers]}]} {
-                return "error"
+        try {
+            if {[string length $data] < 1} {
+                set tok [http::geturl $url -method $method -headers $headers]
+            } else {
+                set tok [http::geturl $url -method $method \
+                    -headers $headers -query $data]
             }
-        } else {
-            if {[catch {set tok [http::geturl $url -method $method \
-                -headers $headers -query $data]}]} {
-                return "error"
+
+            # Get cookie data and save it
+            set cookies [list]
+            set meta [http::meta $tok]
+            foreach {name value} $meta {
+                if { $name eq "Set-Cookie" } {
+                  lappend cookies [lindex [split $value {;}] 0]
+                }
+            }
+
+            set res [http::status $tok]
+            set [namespace current]::response [http::data $tok]
+        } on error {em} {
+            return "error"
+        } finally {
+            if {[info exists tok]==1} {
+                http::cleanup $tok
             }
         }
 
-        # Get cookie data and save it
-        set cookies [list]
-        set meta [http::meta $tok]
-        foreach {name value} $meta {
-            if { $name eq "Set-Cookie" } {
-              lappend cookies [lindex [split $value {;}] 0]
-            }
-        }
-
-        set res [http::status $tok]
-        set [namespace current]::response [http::data $tok]
-
-        http::cleanup $tok
         return $res
     }
 
@@ -98,6 +100,9 @@ oo::class create DrillREST {
         set headerl [list Content-Type "application/x-www-form-urlencoded"]
         set content [::http::formatQuery j_username $USERNAME j_password $PASSWORD]
         set res [my send_request $myurl POST $headerl $content]
+        if {[string compare $res "ok"]!=0} {
+            error "login error"
+        }
         return $response
     }
 
@@ -128,6 +133,9 @@ oo::class create DrillREST {
              lappend headerl Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl POST $headerl $sql_string]
+        if {[string compare $res "ok"]!=0} {
+            error "query error"
+        }
         return $response
     }
 
@@ -142,6 +150,9 @@ oo::class create DrillREST {
              lappend header1 Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl GET $headerl]
+        if {[string compare $res "ok"]!=0} {
+            error "getProfiles error"
+        }
         return $response
     }
 
@@ -156,6 +167,9 @@ oo::class create DrillREST {
              lappend header1 Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl GET $headerl]
+        if {[string compare $res "ok"]!=0} {
+            error "getStorage error"
+        }
         return $response
     }
 
@@ -170,6 +184,9 @@ oo::class create DrillREST {
              lappend header1 Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl GET $headerl]
+        if {[string compare $res "ok"]!=0} {
+            error "getStats error"
+        }
         return $response
     }
 
@@ -184,6 +201,9 @@ oo::class create DrillREST {
              lappend header1 Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl GET $headerl]
+        if {[string compare $res "ok"]!=0} {
+            error "geOptions error"
+        }
         return $response
     }
 }
