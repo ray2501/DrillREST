@@ -116,6 +116,9 @@ oo::class create DrillREST {
              lappend headerl Cookie [join $cookies {;}]
         }
         set res [my send_request $myurl GET $headerl]
+        if {[string compare $res "ok"]!=0} {
+            error "logout error"
+        }
         return $res
     }
 
