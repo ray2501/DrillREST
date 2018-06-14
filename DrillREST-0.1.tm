@@ -80,6 +80,7 @@ oo::class create DrillREST {
             }
 
             set res [http::status $tok]
+            set ncode [::http::ncode $tok]
             set [namespace current]::response [http::data $tok]
         } on error {em} {
             return "error"
@@ -87,6 +88,10 @@ oo::class create DrillREST {
             if {[info exists tok]==1} {
                 http::cleanup $tok
             }
+        }
+
+        if {$ncode == 500 || $ncode == 404} {
+            return "error"
         }
 
         return $res
